@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "../styles/RegisterPage.css"; // You might need to create this CSS file
+import "../styles/RegisterPage.css";
 import { Link } from "react-router-dom";
 
 const RegisterPage = () => {
@@ -7,13 +7,32 @@ const RegisterPage = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
+  // Predetermined accounts
+  const accounts = [
+    { email: "user1@example.com", password: "password123" },
+    { email: "user2@example.com", password: "password123" }
+  ];
+
   const handleRegister = () => {
+    console.log("Attempting to register", email, password);
+
     if (password !== confirmPassword) {
       console.error("Passwords do not match!");
+      alert("Passwords do not match!");
       return;
     }
-    // Handle your registration logic here, e.g., API call, form validation, etc.
-    console.log("Registering with", email, password);
+
+    const accountExists = accounts.some(account => account.email === email);
+    if (accountExists) {
+      console.error("Account with this email already exists!");
+      alert("Account with this email already exists!");
+      return;
+    }
+
+    // Simulate adding the new account
+    accounts.push({ email, password });
+    console.log("Registered successfully", accounts);
+    alert("Registration successful!");
   };
 
   return (

@@ -6,18 +6,18 @@ import "@fortawesome/fontawesome-free/css/all.min.css";
 import { NavLink } from "react-router-dom";
 
 import "./App.css";
-import Home from "./Components/Home";
-import Login from "./Components/Login";
-import Cart from "./Components/Cart";
+import Home from "./Components/Home.js";
+import Login from "./Components/Login.js";
+import Cart from "./Components/Cart.js";
 import About from "./Components/About.js";
 import Shop from "./Components/SearchComp"; // Import the Cart component
-import Checkout from "./Components/Checkout";
-import { CartProvider } from "./Components/CartContext"; // Import the CartProvider
-import Register from "./Components/RegisterComponent";
-import MensClothing from "./Components/MensClothing";
-import WomensClothing from "./Components/WomensClothing";
-import AddItemForm from "./Components/AddItemForm";
-import { AuthProvider } from "./Components/AuthProvider"; // adjust the import path as necessary
+import Checkout from "./Components/Checkout.js";
+import { CartProvider } from "./Components/CartContext.js"; // Import the CartProvider
+import Register from "./Components/RegisterComponent.js";
+import MensClothing from "./Components/MensClothing.js";
+import WomensClothing from "./Components/WomensClothing.js";
+import AddItemForm from "./Components/AddItemForm.js";
+import { AuthProvider } from "./Components/AuthProvider.js"; // adjust the import path as necessary
 
 import "./styles/bootstrap.min.css";
 import "./styles/font-awesome.min.css";
@@ -44,25 +44,21 @@ function App() {
   const [loading, setLoading] = useState(true);
 
   const fetchItems = async () => {
+    setLoading(true);
     try {
       const response = await axios.get(
-        "https://fzp30pyckc.execute-api.us-east-1.amazonaws.com/dev"
+        "https://ixzulbasz7.execute-api.us-east-2.amazonaws.com/dev/clothing"
       );
-
-      // Parse the JSON string in the body property
-      const responseBody = JSON.parse(response.data.body);
-
-      //console.log("Response Body:", responseBody);
-
-      // Move the setItems call outside the fetchItems function
-      setItems(responseBody.Items);
-      setLoading(false);
+      // Parse the JSON string if it's not already parsed.
+      const data = typeof response.data === 'string' ? JSON.parse(response.data) : response.data;
+      setItems(data);
     } catch (error) {
       console.error("Error fetching items:", error);
+    } finally {
       setLoading(false);
     }
   };
-
+  
   useEffect(() => {
     // Call fetchItems inside a separate function to use async/await
     const fetchData = async () => {
