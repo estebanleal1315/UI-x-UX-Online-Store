@@ -1,66 +1,52 @@
 import { useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import Item from "./Item";
-import SearchResults from "./SearchBar";
 import "../styles/SearchComp.css";
 
 export default function SearchComp({ items }) {
   const location = useLocation();
-  const initialItems = location.state?.filteredItems || [];
+  const initialItems = location.state?.filteredItems || items;  // Use default items if location state is undefined
   const searchTerm = location.state?.searchTerm || "";
 
-  const [filteredItems, setFilteredItems] = useState(items);
+  const [filteredItems, setFilteredItems] = useState(initialItems);  // Initialize with initialItems
   const [priceFilter, setPriceFilter] = useState("...");
   const [availableFilter, setAvailableFilter] = useState(false);
 
-
-
-
   useEffect(() => {
+    // Listen to location state changes for new filtered items
     if (location.state?.filteredItems) {
       setFilteredItems(location.state.filteredItems);
-    }
-    else
-    {
-      setInitialItems();
     }
   }, [location.state]);
 
   useEffect(() => {
-    let newFilteredItems = [...initialItems];
+    let newFilteredItems = [...initialItems]; // Start with a fresh copy of initialItems
 
-    // Sorting by price
-    if (priceFilter === "low-to-high") {
-      newFilteredItems.sort((a, b) => a.price - b.price);
-    } else if (priceFilter === "high-to-low") {
-      newFilteredItems.sort((a, b) => b.price - a.price);
-    }
-    else if (priceFilter === "...") {
-      newFilteredItems = items;
+    // Apply price sorting
+    switch (priceFilter) {
+      case "low-to-high":
+        newFilteredItems.sort((a, b) => parseFloat(a.price) - parseFloat(b.price));
+        break;
+      case "high-to-low":
+        newFilteredItems.sort((a, b) => parseFloat(b.price) - parseFloat(a.price));
+        break;
     }
 
-    // Filtering by availability based on quantity
+    // Filter by availability if required
     if (availableFilter) {
-      newFilteredItems = newFilteredItems.filter((item) => item.quantity > 0);
+      newFilteredItems = newFilteredItems.filter(item => item.quantity > 0);
     }
 
     setFilteredItems(newFilteredItems);
-  }, [priceFilter, availableFilter]);
+  }, [priceFilter, availableFilter, initialItems]);  // Include initialItems in the dependency array
 
-
-  const setInitialItems = () => {
-    const initialItems = location.state?.filteredItems || items;
-    setFilteredItems(initialItems);
-  };
-  // Event handler for when an item is clicked
   const onProductClick = (itemName) => {
     console.log(`${itemName} clicked!`);
-    // Add additional logic here for when an item is clicked
+    // Additional logic can be added here
   };
 
   return (
     <div className="component-container">
-      {/* <SearchBar items={items} /> */}
       <div className="filter-container">
         <div>
           <label>
@@ -70,7 +56,7 @@ export default function SearchComp({ items }) {
               value={priceFilter}
               onChange={(e) => setPriceFilter(e.target.value)}
             >
-              <option value="...">...</option>
+              <option value="...">Select</option>
               <option value="low-to-high">Low to High</option>
               <option value="high-to-low">High to Low</option>
             </select>
@@ -78,9 +64,9 @@ export default function SearchComp({ items }) {
           <label className="availability-checkbox">
             Show available items only
             <input
-                type="checkbox"
-                checked={availableFilter}
-                onChange={(e) => setAvailableFilter(e.target.checked)}
+              type="checkbox"
+              checked={availableFilter}
+              onChange={(e) => setAvailableFilter(e.target.checked)}
             />
           </label>
         </div>
@@ -88,7 +74,7 @@ export default function SearchComp({ items }) {
 
       <div className="results-heading">{`Results for '${searchTerm}':`}</div>
       <section className="items-display">
-        {filteredItems?.map((item) => (
+        {filteredItems.map((item) => (
           <div key={item.id} className="item-container">
             <Item
               image={item.image}
@@ -104,7 +90,6 @@ export default function SearchComp({ items }) {
           </div>
         ))}
       </section>
-
     </div>
   );
 }

@@ -43,55 +43,47 @@ function App() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchItems = async () => {
-    setLoading(true);
-    try {
-      const response = await axios.get(
-        "https://ixzulbasz7.execute-api.us-east-2.amazonaws.com/dev/clothing"
-      );
-      // Parse the JSON string if it's not already parsed.
-      const data = typeof response.data === 'string' ? JSON.parse(response.data) : response.data;
-      setItems(data);
-    } catch (error) {
-      console.error("Error fetching items:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-  
   useEffect(() => {
-    // Call fetchItems inside a separate function to use async/await
-    const fetchData = async () => {
-      await fetchItems();
-    };
+    const fetchItems = async () => {
+      setLoading(true);
+      try {
+        const response = await axios.get("https://ixzulbasz7.execute-api.us-east-2.amazonaws.com/dev/clothing");
+        const data = typeof response.data === 'string' ? JSON.parse(response.data) : response.data;
+        const mensItems = (data.MensClothing || []).map(item => ({ ...item, category: 'Men' }));
+        const womensItems = (data.WomensClothing || []).map(item => ({ ...item, category: 'Women' }));
+        const combinedItems = [...mensItems, ...womensItems];   
+        setItems(combinedItems);
 
-    fetchData();
-  }, []); // Empty dependency array ensures that this effect runs only once, similar to componentDidMount
+      } catch (error) {
+        console.error("Error fetching items:", error);
+        setItems([]); // Set to empty array on error
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchItems();
+  }, []);
 
   const addItem = (newItem) => {
-    setItems((prevItems) => [
+    setItems(prevItems => [
       ...prevItems,
       { ...newItem, id: prevItems.length + 1 },
     ]);
   };
 
-  console.log("Items in App component:", items);
   function transformNewItemToOldFormat(newItem) {
-    console.log(newItem.QTY.S);
     return {
-      id: newItem.ID.S, // Assuming that ID is unique and a string
-      name: newItem.ITEM.S,
-      price: parseFloat(newItem.PRICE.N), // Convert string to float
-      quantity: parseInt(newItem.QTY.N, 10), // Convert string to integer
-      description: newItem.DESCRIPTION.S,
-      image: newItem.IMAGE.S,
+      id: newItem.SKU, // Use SKU as id
+      name: newItem.ITEM,
+      price: parseFloat(newItem.PRICE),
+      quantity: parseInt(newItem.NUM_AVAILABLE, 10),
+      description: newItem.DESCRIPTION,
+      image: newItem.ITEM_IMAGE, // Adjust if the key for image URL differs
       inCart: 1,
     };
   }
 
-  const newItems = items;
-
-  const oItems = newItems.map(transformNewItemToOldFormat);
+  const oItems = items.map(transformNewItemToOldFormat);
 
   if (loading) {
     return <div>Loading...</div>;
