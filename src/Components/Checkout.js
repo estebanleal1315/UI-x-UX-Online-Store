@@ -2,11 +2,11 @@ import React, { useState, useContext } from "react";
 import { Link } from "react-router-dom";
 import "../styles/checkout.css";
 import { CartContext } from "./CartContext";
-import axios from "axios";
 
 const Checkout = () => {
   const { cartItems, setCartItems } = useContext(CartContext);
   const [checkoutCompleted, setCheckoutCompleted] = useState(false);
+  const [completedOrder, setCompletedOrder] = useState(null);
   const [formData, setFormData] = useState({
     firstName: "",
     middleInitial: "",
@@ -29,28 +29,31 @@ const Checkout = () => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    const currentDate = new Date().toISOString();
-    const formDataWithDate = { ...formData, orderDate: currentDate };
-    try {
-      const response = await axios.post("https://your-api-url.com/checkout", formDataWithDate);
-      if (response.status === 200) {
-        setCheckoutCompleted(true);
-      } else {
-        console.error("Error submitting data:", response.statusText);
-      }
-    } catch (error) {
-      console.error("Axios error:", error.message);
-    }
+    setCompletedOrder({ formData, cartItems }); // Store both form data and cart items
+    setCheckoutCompleted(true);
+    setCartItems([]); // Clear cart items on successful checkout
   };
 
-  if (checkoutCompleted) {
+  if (checkoutCompleted && completedOrder) {
     return (
       <div className="checkout-container2">
-        <h1>Thank you for your purchase!</h1>
-        {/* Confirmation Details */}
-        <Link to="/" className="back-link2" onClick={() => setCartItems([])}>Back to Shopping</Link>
+        <h1>Thank you for your purchase, {completedOrder.formData.firstName}!</h1>
+        <h2>Order Summary</h2>
+        <div>
+          <h3>Shipping to:</h3>
+          <p>{completedOrder.formData.streetAddress}, {completedOrder.formData.apartmentNumber ? `${completedOrder.formData.apartmentNumber}, ` : ''}{completedOrder.formData.city}, {completedOrder.formData.state} {completedOrder.formData.zipcode}</p>
+          <h3>Contact:</h3>
+          <p>Email: {completedOrder.formData.email}, Phone: {completedOrder.formData.phoneNumber}</p>
+        </div>
+        <h3>Items Purchased:</h3>
+        <ul>
+          {completedOrder.cartItems.map((item, index) => (
+            <li key={index}>{item.name} - Quantity: {item.quantity}</li>
+          ))}
+        </ul>
+        <Link to="/" className="back-link2">Back to Shopping</Link>
       </div>
     );
   }
