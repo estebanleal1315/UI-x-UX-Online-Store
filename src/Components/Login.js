@@ -8,9 +8,9 @@ const LoginPage = () => {
   const { setUser } = useContext(CartContext);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
   const { logint } = useAuth();
-  const [showError, setShowError] = useState(false);
 
   const validateEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -18,8 +18,11 @@ const LoginPage = () => {
   };
 
   const handleLogin = () => {
+    // Clear previous error messages
+    setErrorMessage("");
+
     if (!validateEmail(email)) {
-      alert("Invalid Email");
+      setErrorMessage("Invalid Email");
       return;
     }
 
@@ -30,10 +33,9 @@ const LoginPage = () => {
       logint(); // Update the login state to logged in
       setUser(email); // Set the user in context
       navigate('/'); // Redirect to homepage or other page
-      alert("Login successful!");
+      // No need to set success message here since we're redirecting
     } else {
-      setShowError(true);
-      alert("Incorrect email or password");
+      setErrorMessage("Incorrect email or password");
     }
   };
 
@@ -41,25 +43,31 @@ const LoginPage = () => {
     <div className="login-container">
       <h2>Login</h2>
       <div className="login-form">
+        <label htmlFor="emailInput">Email</label>
         <input
+          id="emailInput"
           type="email"
           placeholder="Enter your email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          required
+          aria-label="Email"
         />
+        <label htmlFor="passwordInput">Password</label>
         <input
+          id="passwordInput"
           type="password"
           placeholder="Enter your password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          required
+          aria-label="Password"
         />
-        {showError && (
-          <div style={{ color: "red" }}>Incorrect username or password</div>
-        )}
-        <button onClick={handleLogin}>Login</button>
+        <div className="error-message" style={{ color: "red" }} aria-live="assertive">{errorMessage}</div>
+        <button onClick={handleLogin} role="button">Login</button>
         <div style={{ marginTop: 20 }}>
           <span>Don't have an account? </span>
-          <Link to="/register">Register</Link>
+          <Link to="/register" role="link">Register</Link>
         </div>
       </div>
     </div>

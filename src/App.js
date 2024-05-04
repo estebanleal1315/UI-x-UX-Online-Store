@@ -110,27 +110,27 @@ function App() {
 
           {/* Header Section Begin */}
           <header className="header">
-            <div className="header__top">
-              <div className="container">
-                <div className="row">
-                  <div className="col-lg-6 col-md-7"></div>
-                      <div className="nav-links">
-                        <Link to="/">Home</Link>
-                        <Link to="/search-comp" >Shop</Link>
-                        <Link to="/about-us">About Us</Link>
-                        <SearchBar items={oItems} />
-                        <Link className="login-link" to="/login">
-                          <FaUserCircle /> {/* Render the avatar icon */}
-                        </Link>
-                        <Link className="cart-link" to="/cart">
-                          <FaShoppingBag /> {/* Render the shopping bag icon */}
-                        </Link>
-                      </div>
-                </div>
-              </div>
-            </div>
+          <div className="header__top">
+           <div className="container">
+            <div className="row">
+              <div className="col-lg-6 col-md-7"></div>
+               <div className="nav-links">
+                <Link to="/">Home</Link>
+                <Link to="/search-comp" >Shop</Link>
+                <Link to="/about-us">About Us</Link>
+                <SearchBar items={oItems} />
+                <Link className="login-link" to="/login" aria-label="Account Login">
+                <FaUserCircle /> {/* Render the avatar icon */}
+                </Link>
+                <Link className="cart-link" to="/cart" aria-label="Shopping Cart">
+                <FaShoppingBag /> {/* Render the shopping bag icon */}
+                </Link>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
 
-          </header>
 
           <Routes>
             <Route path="/" element={<Home items={oItems} />} />

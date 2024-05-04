@@ -6,62 +6,72 @@ const RegisterPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [feedback, setFeedback] = useState({ message: "", type: "polite" });
 
-  // Predetermined accounts
-  const accounts = [
-    { email: "user1@example.com", password: "password123" },
-    { email: "user2@example.com", password: "password123" }
-  ];
+  const loadAccounts = () => {
+    const storedAccounts = localStorage.getItem('accounts');
+    return storedAccounts ? JSON.parse(storedAccounts) : [];
+  };
 
   const handleRegister = () => {
-    console.log("Attempting to register", email, password);
+    setFeedback({ message: "", type: "polite" }); // Clear previous messages
 
     if (password !== confirmPassword) {
-      console.error("Passwords do not match!");
-      alert("Passwords do not match!");
+      setFeedback({ message: "Passwords do not match!", type: "assertive" });
       return;
     }
 
+    let accounts = loadAccounts();
     const accountExists = accounts.some(account => account.email === email);
     if (accountExists) {
-      console.error("Account with this email already exists!");
-      alert("Account with this email already exists!");
+      setFeedback({ message: "Account with this email already exists!", type: "assertive" });
       return;
     }
 
-    // Simulate adding the new account
+    // Register the new account
     accounts.push({ email, password });
-    console.log("Registered successfully", accounts);
-    alert("Registration successful!");
+    localStorage.setItem('accounts', JSON.stringify(accounts));
+    setFeedback({ message: "Registration successful!", type: "polite" });
   };
 
   return (
     <div className="register-container">
       <div className="register-form">
         <h2>Register</h2>
+        <label htmlFor="email">Email</label>
         <input
+          id="email"
           type="email"
-          placeholder="Username"
+          placeholder="Enter your email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          required
+          aria-label="Email"
         />
+        <label htmlFor="password">Password</label>
         <input
+          id="password"
           type="password"
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          required
+          aria-label="Password"
         />
+        <label htmlFor="confirmPassword">Confirm Password</label>
         <input
+          id="confirmPassword"
           type="password"
           placeholder="Confirm Password"
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
+          required
+          aria-label="Confirm Password"
         />
-        <button onClick={handleRegister}>Register</button>
-        <div className="login-option">
-          <span>Already have an account? </span>
-          <Link to="/login">Login</Link>
-        </div>
+        <div className="message" aria-live={feedback.type}>{feedback.message}</div>
+        <button onClick={handleRegister} role="button">Register</button>
+        <span>Already have an account? </span>
+        <Link to="/login" role="link">Login</Link>
       </div>
     </div>
   );
