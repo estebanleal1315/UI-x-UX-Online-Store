@@ -1,13 +1,14 @@
 import React, { useState, useContext } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { CartContext } from "./CartContext"; // Import CartContext
+import { CartContext } from "./CartContext";
 import "../styles/ProductDetails.css";
 
 const ItemDetails = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [size, setSize] = useState("Medium"); // Default size set to 'medium'
-  const { setCartItems, addToCart } = useContext(CartContext); // Use CartContext
+  const { addToCart } = useContext(CartContext);
+  const [size, setSize] = useState("Medium"); // Default size set to 'Medium'
+  const [feedbackMessage, setFeedbackMessage] = useState(""); // State to hold feedback message
 
   const item = location.state?.itemData || {
     id: "",
@@ -21,14 +22,15 @@ const ItemDetails = () => {
   };
 
   const handleAddToCart = () => {
-    const itemWithSize = { ...item, size }; // This uses the current state value of 'size'
-    addToCart(itemWithSize);
-  };
-
-  const handleCheckout = () => {
-    // Navigate to checkout page or implement checkout functionality
-    alert("Proceed to checkout");
-    // navigate('/checkout'); // Example: navigate to a checkout page
+    if (item.quantity > 0) {
+      const itemWithSize = { ...item, size };
+      addToCart(itemWithSize);
+      setFeedbackMessage("Item added to cart!"); // Set feedback message
+      setTimeout(() => setFeedbackMessage(""), 3000); // Clear message after 3 seconds
+    } else {
+      setFeedbackMessage("This item is out of stock."); // Inform user item is out of stock
+      setTimeout(() => setFeedbackMessage(""), 3000); // Clear message after 3 seconds
+    }
   };
 
   const goBack = () => {
@@ -36,32 +38,35 @@ const ItemDetails = () => {
   };
 
   return (
-    <div className="product-details">
+    <div className="product-details" aria-labelledby="product-title">
       <img className="product-image" src={item.image} alt={item.name} />
-      <h2 className="product-title">{item.name}</h2>
+      <h2 className="product-title" id="product-title">{item.name}</h2>
       <p className="product-price">${item.price.toFixed(2)}</p>
       <p className="product-description">{item.description}</p>
-      <p className="product-availability">{`Available: ${item.quantity}`}</p>
+      <p className="product-availability">
+        {item.quantity > 0 ? `Available: ${item.quantity}` : <strong>Out of Stock</strong>}
+      </p>
       <div className="size-selector">
-        <label>
-          Size:
-          <select value={size} onChange={(e) => setSize(e.target.value)}>
-            <option value="Small">Small</option>
-            <option value="Medium">Medium</option>
-            <option value="Large">Large</option>
-          </select>
+        <label htmlFor="size-select">Size:
+        <select id="size-select" value={size} onChange={(e) => setSize(e.target.value)} aria-label="Select size" disabled={item.quantity === 0}>
+          <option value="Small">Small</option>
+          <option value="Medium">Medium</option>
+          <option value="Large">Large</option>
+        </select>
         </label>
       </div>
+      {feedbackMessage && (
+        <div className="feedback-message" aria-live="assertive">
+          {feedbackMessage}
+        </div>
+      )}
       <div className="action-buttons">
-        <button className="back-button" onClick={goBack}>
+        <button className="back-button" onClick={goBack} aria-label="Go back to previous page">
           Back
         </button>
-        <button className="cart-button" onClick={handleAddToCart}>
+        <button className="cart-button" onClick={handleAddToCart} aria-label="Add item to cart" disabled={item.quantity === 0} style={{ opacity: item.quantity > 0 ? 1 : 0.5 }}>
           Add to Cart
         </button>
-        {/* <button className="checkout-button" onClick={handleCheckout}>
-          Checkout
-        </button> */}
       </div>
     </div>
   );

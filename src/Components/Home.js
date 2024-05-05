@@ -1,32 +1,18 @@
 import React, { useState, useContext } from "react";
 import "../styles/Home.css";
-import "../styles/bootstrap.min.css";
-import "../styles/font-awesome.min.css";
-import "../styles/elegant-icons.css";
-import "../styles/magnific-popup.css";
-import "../styles/nice-select.css";
-import "../styles/owl.carousel.min.css";
-import "../styles/slicknav.min.css";
-import "../styles/style.css";
 import Item from "./Item";
 import { useNavigate } from "react-router-dom";
 import { CartContext } from "./CartContext";
 import banner from "../images/banner/banner66.png";
 
-
 const Home = ({ items }) => {
   const navigate = useNavigate();
   const { addToCart } = useContext(CartContext);
   const [searchTerm, setSearchTerm] = useState("");
-  const [filteredItems] = useState(items);
 
   const onProductClick = (itemName) => {
     console.log(`${itemName} clicked!`);
     // Add additional logic here for when an item is clicked
-  };
-
-  const addItem = () => {
-    navigate(`/add-item`);
   };
 
   return (
@@ -35,24 +21,19 @@ const Home = ({ items }) => {
         <img className="banner-image"
             src={banner}
             alt="Header Image"
-             style={{ display: 'block', margin: 'auto'  }}
+            style={{ display: 'block', margin: 'auto' }}
         />
       </div>
       <div className="home-container">
-
         <section className="product-section">
           <div className="product-container">
             <div className="filter-controls">
-              <ul>
-                <h3 style={{ padding: 20 }}>Best Sellers</h3>
-              </ul>
+              <h3 style={{ padding: 20 }}>Best Sellers</h3>
             </div>
 
-            <div className="product-display">
-              {filteredItems?.sort((a, b) => b.price - a.price)
-                  .slice(0, 10)
-                .map((item) => (
-                <div key={item.id} className="product-item">
+            <div className="product-display" aria-live="polite">
+              {items.slice(0, 10).sort((a, b) => b.price - a.price).map((item) => (
+                <div key={item.id} className="product-item" onClick={() => onProductClick(item.description)} tabIndex="0" aria-label={`Click for more about ${item.name}`}>
                   <Item
                     image={item.image}
                     name={item.name}
@@ -62,7 +43,6 @@ const Home = ({ items }) => {
                     size={item.size}
                     inCart={item.inCart}
                     uniqueId={item.uniqueId}
-                    onClick={() => onProductClick(item.description)}
                   />
                 </div>
               ))}
@@ -70,81 +50,23 @@ const Home = ({ items }) => {
           </div>
         </section>
       </div>
-      {/* Product Section End */}
-      {/* Footer Section Begin */}
       <footer className="footer">
         <div className="container">
           <div className="row">
             <div className="col-lg-3 col-md-6 col-sm-6">
               <div className="footer__about">
-                <div className="footer__logo">
-                  <a href="#">
-                    <img src="../images/footer-logo.png" alt="" />
-                  </a>
-                </div>
-                <p>
-                  The customer is at the heart of our unique business model,
-                  which includes design.
-                </p>
                 <a href="#">
-                  <img src="../images/payment.png" alt="" />
+                  <img src="../images/footer-logo.png" alt="Footer Logo" />
+                </a>
+                <p>The customer is at the heart of our unique business model, which includes design.</p>
+                <a href="#">
+                  <img src="../images/payment.png" alt="Payment Methods" />
                 </a>
               </div>
             </div>
-            <div className="col-lg-2 offset-lg-1 col-md-3 col-sm-6">
-              <div className="footer__widget">
-                <h6>Shopping</h6>
-                <ul>
-                  <li>
-                    <a href="#">Clothing Store</a>
-                  </li>
-                  <li>
-                    <a href="#">Trending Shoes</a>
-                  </li>
-                  <li>
-                    <a href="#">Accessories</a>
-                  </li>
-                  <li>
-                    <a href="#">Sale</a>
-                  </li>
-                </ul>
-              </div>
-            </div>
-            <div className="col-lg-2 col-md-3 col-sm-6">
-              <div className="footer__widget">
-                <h6>Shopping</h6>
-                <ul>
-                  <li>
-                    <a href="#">Contact Us</a>
-                  </li>
-                  <li>
-                    <a href="#">Payment Methods</a>
-                  </li>
-                  <li>
-                    <a href="#">Delivary</a>
-                  </li>
-                  <li>
-                    <a href="#">Return &amp; Exchanges</a>
-                  </li>
-                </ul>
-              </div>
-            </div>
-        </div>
+          </div>
         </div>
       </footer>
-
-      <div className="search-model">
-        <div className="h-100 d-flex align-items-center justify-content-center">
-          <div className="search-close-switch">+</div>
-          <form className="search-model-form">
-            <input
-              type="text"
-              id="search-input"
-              placeholder="Search here....."
-            />
-          </form>
-        </div>
-      </div>
     </div>
   );
 };

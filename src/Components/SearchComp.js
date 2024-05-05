@@ -72,7 +72,7 @@ export default function SearchComp({ items }) {
         </div>
       </div>
 
-      <div className="results-heading">{`Results for '${searchTerm}':`}</div>
+      <div className="results-heading">{`${searchTerm}`}</div>
       <section className="items-display">
         {filteredItems.map((item) => (
           <div key={item.id} className="item-container">

@@ -31,7 +31,11 @@ const Checkout = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setCompletedOrder({ formData, cartItems }); // Store both form data and cart items
+    const itemsWithPurchaseDetails = cartItems.map(item => ({
+      ...item,
+      purchasedQuantity: item.quantity  // Assuming 'quantity' to be the number purchased
+    }));
+    setCompletedOrder({ formData, cartItems: itemsWithPurchaseDetails });
     setCheckoutCompleted(true);
     setCartItems([]); // Clear cart items on successful checkout
   };
@@ -46,11 +50,16 @@ const Checkout = () => {
           <p>{completedOrder.formData.streetAddress}, {completedOrder.formData.apartmentNumber ? `${completedOrder.formData.apartmentNumber}, ` : ''}{completedOrder.formData.city}, {completedOrder.formData.state} {completedOrder.formData.zipcode}</p>
           <h3>Contact:</h3>
           <p>Email: {completedOrder.formData.email}, Phone: {completedOrder.formData.phoneNumber}</p>
+          <h3>Payment Method:</h3>
+          <p>Card ending in {completedOrder.formData.cardNumber.slice(-4)}</p>
         </div>
         <h3>Items Purchased:</h3>
         <ul>
           {completedOrder.cartItems.map((item, index) => (
-            <li key={index}>{item.name} - Quantity: {item.quantity}</li>
+            <li key={index}>
+              <img src={item.image} alt={item.name} style={{ width: '50px', height: '50px' }} />
+              {item.name} - Size: {item.size} 
+            </li>
           ))}
         </ul>
         <Link to="/" className="back-link2">Back to Shopping</Link>
